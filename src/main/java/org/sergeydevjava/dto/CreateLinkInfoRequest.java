@@ -3,7 +3,6 @@ package org.sergeydevjava.dto;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 @Getter
 @Setter
