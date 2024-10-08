@@ -14,7 +14,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 
     public static final Integer LINK_LENGTH = 8;
 
-    ConcurrentMap<String, CreateLinkInfoRequest> repository = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, CreateLinkInfoRequest> repository = new ConcurrentHashMap<>();
 
     public String createShortLink(CreateLinkInfoRequest createLinkInfoRequest) {
         String shortLink = RandomStringUtils.randomAlphanumeric(LINK_LENGTH);
