@@ -11,7 +11,7 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class LinkInfoResponse implements Comparable<LinkInfoResponse> {
+public class LinkInfoResponse {
 
     private UUID id;
     private String link;
@@ -20,9 +20,4 @@ public class LinkInfoResponse implements Comparable<LinkInfoResponse> {
     private String description;
     private Boolean active;
     private Long openingCount;
-
-    @Override
-    public int compareTo(LinkInfoResponse linkInfoResponse) {
-        return this.getLink().compareTo(linkInfoResponse.getLink());
-    }
 }
