@@ -9,6 +9,10 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    mavenLocal()
+    maven {
+        url = uri("https://raw.githubusercontent.com/sergeydevjava/logging-starter/main/maven-repo/")
+    }
 }
 
 dependencies {
@@ -18,6 +22,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     implementation 'org.apache.commons:commons-lang3:3.0'
+
+//    implementation 'com.sergeydevjava:logging-starter-maven:1.0-SNAPSHOT'
+    implementation 'com.sergeydevjava:logging-starter:1.1-SNAPSHOT'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
