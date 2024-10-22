@@ -19,8 +19,6 @@ class LinkInfoServiceImplTest {
 
 
     private static final Integer NUMBER_OF_GENERATED_LINK = 10;
-    public static final Integer SINGLE_RECORD = 1;
-    public static final Integer EMPTY = 0
             ;
     @Autowired
     private LinkInfoProperty linkInfoProperty;

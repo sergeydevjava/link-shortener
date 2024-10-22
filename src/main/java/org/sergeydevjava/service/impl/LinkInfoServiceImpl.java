@@ -10,10 +10,14 @@ import org.sergeydevjava.property.LinkInfoProperty;
 import org.sergeydevjava.repository.LinkInfoRepository;
 import org.sergeydevjava.service.LinkInfoService;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static java.util.Objects.nonNull;
+import static jdk.dynalink.linker.support.Guards.isNotNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 
@@ -68,18 +72,11 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         LinkInfo linkInfo = linkInfoRepository
                 .findById(updateShortLinkRequest.getId())
                 .orElseThrow(() -> new NotFoundException("Не возможно найти сущность: идентификатор " + updateShortLinkRequest.getId()));
-        if (isNotEmpty(updateShortLinkRequest.getLink())) {
-            linkInfo.setLink(updateShortLinkRequest.getLink());
-        }
-        if (nonNull(updateShortLinkRequest.getEndTime())) {
-            linkInfo.setEndTime(updateShortLinkRequest.getEndTime());
-        }
-        if (isNotEmpty(updateShortLinkRequest.getDescription())) {
-            linkInfo.setDescription(updateShortLinkRequest.getDescription());
-        }
-        if (nonNull(updateShortLinkRequest.getActive())) {
-            linkInfo.setActive(updateShortLinkRequest.getActive());
-        }
+
+        setIfNotEmpty(updateShortLinkRequest.getLink(), linkInfo::setLink);
+        setIfNotNull(updateShortLinkRequest.getEndTime(), linkInfo::setEndTime);
+        setIfNotEmpty(updateShortLinkRequest.getDescription(), linkInfo::setDescription);
+        setIfNotNull(updateShortLinkRequest.getActive(), linkInfo::setActive);
         return toResponse(linkInfoRepository.save(linkInfo));
     }
 
@@ -93,5 +90,17 @@ public class LinkInfoServiceImpl implements LinkInfoService {
                 .active(linkInfo.getActive())
                 .openingCount(linkInfo.getOpeningCount())
                 .build();
+    }
+
+    private void setIfNotEmpty(String field, Consumer<String> consumer) {
+        if (isNotEmpty(field)) {
+            consumer.accept(field);
+        }
+    }
+
+    private <T> void setIfNotNull(T field, Consumer<T> consumer) {
+        if (!Objects.isNull(field)) {
+            consumer.accept(field);
+        }
     }
 }
