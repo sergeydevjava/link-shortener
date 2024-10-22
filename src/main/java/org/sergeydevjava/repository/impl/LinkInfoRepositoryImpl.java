@@ -9,13 +9,17 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static java.util.Objects.isNull;
+
 public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
     private ConcurrentMap<String, LinkInfo> storage = new ConcurrentHashMap<>();
 
     @Override
     public LinkInfo save(LinkInfo linkInfo) {
-        linkInfo.setId(UUID.randomUUID());
+        if (isNull(linkInfo.getId())) {
+            linkInfo.setId(UUID.randomUUID());
+        }
         storage.put(linkInfo.getShortLink(), linkInfo);
         return linkInfo;
     }
@@ -28,5 +32,17 @@ public class LinkInfoRepositoryImpl implements LinkInfoRepository {
     @Override
     public List<LinkInfo> findAll() {
         return storage.values().stream().toList();
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        storage.entrySet().removeIf(stringLinkInfoEntry -> stringLinkInfoEntry.getValue().getId().equals(id));
+    }
+
+    @Override
+    public Optional<LinkInfo> findById(UUID id) {
+        return storage.values().stream()
+                .filter(linkInfo -> linkInfo.getId().equals(id))
+                .findFirst();
     }
 }
