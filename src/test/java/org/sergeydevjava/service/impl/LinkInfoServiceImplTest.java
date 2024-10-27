@@ -3,52 +3,72 @@ package org.sergeydevjava.service.impl;
 import org.junit.jupiter.api.Test;
 import org.sergeydevjava.dto.CreateLinkInfoRequest;
 import org.sergeydevjava.dto.LinkInfoResponse;
-import org.sergeydevjava.repository.impl.LinkInfoRepositoryImpl;
+import org.sergeydevjava.dto.UpdateShortLinkRequest;
+import org.sergeydevjava.exception.NotFoundException;
+import org.sergeydevjava.property.LinkInfoProperty;
 import org.sergeydevjava.service.LinkInfoService;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.sergeydevjava.util.Constant.SHORT_LINK_LENGTH;
-
+@SpringBootTest
 class LinkInfoServiceImplTest {
 
-    public static final int NUMBER_OF_GENERATED_LINK = 10;
+
+    private static final Integer NUMBER_OF_GENERATED_LINK = 10;
+            ;
+    @Autowired
+    private LinkInfoProperty linkInfoProperty;
+
+    @Autowired
+    private LinkInfoService linkInfoService;
 
     @Test
-    void createShortLink() {
-
-        LinkInfoResponse linkInfo = createShortLink(new LinkInfoServiceImpl(new LinkInfoRepositoryImpl()));
-
-        assertEquals(SHORT_LINK_LENGTH, linkInfo.getShortLink().length());
+    void createShortLinkTest() {
+        LinkInfoResponse linkInfo = createShortLink();
+        assertEquals(linkInfoProperty.getShortLinkLength(), linkInfo.getShortLink().length());
     }
 
     @Test
     void getByShortLink() {
-
-        LinkInfoService linkInfoService = new LinkInfoServiceImpl(new LinkInfoRepositoryImpl());
-
-        LinkInfoResponse linkInfoCreationResponse = createShortLink(linkInfoService);
-
+        LinkInfoResponse linkInfoCreationResponse = createShortLink();
         LinkInfoResponse linkInfoGetByShortLinkResponse = linkInfoService.getByShortLink(linkInfoCreationResponse.getShortLink());
-
         assertEquals(linkInfoCreationResponse, linkInfoGetByShortLinkResponse);
     }
 
     @Test
     void findAllShortLink() {
-
-        LinkInfoService linkInfoService = new LinkInfoServiceImpl(new LinkInfoRepositoryImpl());
-
-        IntStream.range(0, NUMBER_OF_GENERATED_LINK).forEach(it -> createShortLink(linkInfoService));
-
+        IntStream.range(0, NUMBER_OF_GENERATED_LINK).forEach(it -> createShortLink());
         assertEquals(NUMBER_OF_GENERATED_LINK, linkInfoService.findByFilter().size());
     }
 
-    private static LinkInfoResponse createShortLink(LinkInfoService linkInfoService) {
+    @Test
+    void deleteById() {
+        LinkInfoResponse linkInfo = createShortLink("http://somedomain1.com");
+        assertNotNull(linkInfoService.getByShortLink(linkInfo.getShortLink()));
+        linkInfoService.deleteById(linkInfo.getId());
+        assertThrows(NotFoundException.class, () -> linkInfoService.getByShortLink(linkInfo.getShortLink()));
+    }
+
+    @Test
+    void update() {
+        LinkInfoResponse linkInfo = createShortLink("http://somedomain1.com");
+        assertEquals(linkInfoProperty.getShortLinkLength(), linkInfo.getShortLink().length());
+        assertTrue(linkInfoService.getByShortLink(linkInfo.getShortLink()).getActive());
+        linkInfoService.update(UpdateShortLinkRequest.builder().id(linkInfo.getId()).active(Boolean.FALSE).build());
+        assertFalse(linkInfoService.getByShortLink(linkInfo.getShortLink()).getActive());
+    }
+
+    private LinkInfoResponse createShortLink() {
+        return createShortLink(null);
+    }
+
+    private LinkInfoResponse createShortLink(String longLink) {
         CreateLinkInfoRequest createLinkInfoRequest = CreateLinkInfoRequest.builder()
-                .link("http://somedomain.com")
+                .link(isNotEmpty(longLink) ? longLink : "http://somedomain.com")
                 .endTime(LocalDateTime.now().plusDays(30))
                 .description("Some description")
                 .active(Boolean.TRUE)
