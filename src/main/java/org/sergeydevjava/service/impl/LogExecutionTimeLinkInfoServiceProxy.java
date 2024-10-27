@@ -23,30 +23,30 @@ public class LogExecutionTimeLinkInfoServiceProxy implements LinkInfoService {
 
     @Override
     public LinkInfoResponse createLinkInfo(CreateLinkInfoRequest createLinkInfoRequest) {
-        return executeWithTimeTrack("createLinkInfo", () -> linkInfoService.createLinkInfo(createLinkInfoRequest));
+        return supplyWithTimeTrack("createLinkInfo", () -> linkInfoService.createLinkInfo(createLinkInfoRequest));
     }
 
     @Override
     public LinkInfoResponse getByShortLink(String shortLink) {
-        return executeWithTimeTrack("getByShortLink", () -> linkInfoService.getByShortLink(shortLink));
+        return supplyWithTimeTrack("getByShortLink", () -> linkInfoService.getByShortLink(shortLink));
     }
 
     @Override
     public List<LinkInfoResponse> findByFilter() {
-        return executeWithTimeTrack("findByFilter", linkInfoService::findByFilter);
+        return supplyWithTimeTrack("findByFilter", linkInfoService::findByFilter);
     }
 
     @Override
     public void deleteById(UUID id) {
-        executeWithTimeTrack("deleteById", () -> linkInfoService.deleteById(id));
+        runWithTimeTrack("deleteById", () -> linkInfoService.deleteById(id));
     }
 
     @Override
     public LinkInfoResponse update(UpdateShortLinkRequest updateShortLinkRequest) {
-        return executeWithTimeTrack("update", () -> linkInfoService.update(updateShortLinkRequest));
+        return supplyWithTimeTrack("update", () -> linkInfoService.update(updateShortLinkRequest));
     }
 
-    private <T> T executeWithTimeTrack(String methodName, Supplier<T> lambda) {
+    private <T> T supplyWithTimeTrack(String methodName, Supplier<T> lambda) {
         Instant start = Instant.now();
         try {
             return lambda.get();
@@ -57,7 +57,7 @@ public class LogExecutionTimeLinkInfoServiceProxy implements LinkInfoService {
         }
     }
 
-    private void executeWithTimeTrack(String methodName, Runnable lambda) {
+    private void runWithTimeTrack(String methodName, Runnable lambda) {
         Instant start = Instant.now();
         try {
             lambda.run();

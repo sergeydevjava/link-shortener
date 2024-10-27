@@ -73,10 +73,18 @@ public class LinkInfoServiceImpl implements LinkInfoService {
                 .findById(updateShortLinkRequest.getId())
                 .orElseThrow(() -> new NotFoundException("Не возможно найти сущность: идентификатор " + updateShortLinkRequest.getId()));
 
-        setIfNotEmpty(updateShortLinkRequest.getLink(), linkInfo::setLink);
-        setIfNotNull(updateShortLinkRequest.getEndTime(), linkInfo::setEndTime);
-        setIfNotEmpty(updateShortLinkRequest.getDescription(), linkInfo::setDescription);
-        setIfNotNull(updateShortLinkRequest.getActive(), linkInfo::setActive);
+        if(isNotEmpty(updateShortLinkRequest.getLink())) {
+            linkInfo.setLink(updateShortLinkRequest.getLink());
+        }
+        if(!Objects.isNull(updateShortLinkRequest.getEndTime())) {
+            linkInfo.setEndTime(updateShortLinkRequest.getEndTime());
+        }
+        if(isNotEmpty(updateShortLinkRequest.getDescription())) {
+            linkInfo.setDescription(updateShortLinkRequest.getDescription());
+        }
+        if(!Objects.isNull(updateShortLinkRequest.getActive())) {
+            linkInfo.setActive(updateShortLinkRequest.getActive());
+        }
         return toResponse(linkInfoRepository.save(linkInfo));
     }
 
@@ -90,17 +98,5 @@ public class LinkInfoServiceImpl implements LinkInfoService {
                 .active(linkInfo.getActive())
                 .openingCount(linkInfo.getOpeningCount())
                 .build();
-    }
-
-    private void setIfNotEmpty(String field, Consumer<String> consumer) {
-        if (isNotEmpty(field)) {
-            consumer.accept(field);
-        }
-    }
-
-    private <T> void setIfNotNull(T field, Consumer<T> consumer) {
-        if (!Objects.isNull(field)) {
-            consumer.accept(field);
-        }
     }
 }
