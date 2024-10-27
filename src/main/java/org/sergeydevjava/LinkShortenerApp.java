@@ -1,7 +1,5 @@
 package org.sergeydevjava;
 
-
-
 import com.sergeydevjava.LoggingStarterAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
