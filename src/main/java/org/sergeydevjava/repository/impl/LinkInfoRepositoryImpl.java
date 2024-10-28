@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentMap;
 import static java.util.Objects.isNull;
 
 @Service()
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
     private ConcurrentMap<String, LinkInfo> storage = new ConcurrentHashMap<>();
