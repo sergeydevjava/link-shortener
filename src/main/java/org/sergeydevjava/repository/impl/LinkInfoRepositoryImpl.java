@@ -2,8 +2,6 @@ package org.sergeydevjava.repository.impl;
 
 import org.sergeydevjava.model.LinkInfo;
 import org.sergeydevjava.repository.LinkInfoRepository;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import static java.util.Objects.isNull;
 
-@Service()
+@Service
 public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
     private ConcurrentMap<String, LinkInfo> storage = new ConcurrentHashMap<>();
