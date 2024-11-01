@@ -57,7 +57,7 @@ public class LogExecutionTimeBeanPostProcessor implements BeanPostProcessor {
 
 
         return Proxy.newProxyInstance(clazz.getClassLoader(), bean.getClass().getInterfaces(), (proxy, method, args) -> {
-            boolean methodIsAnnotated = methods.stream().anyMatch(pojoMethod -> equals(pojoMethod, method));
+            boolean methodIsAnnotated = methods.stream().anyMatch(pojoMethod -> areMethodsEqual(pojoMethod, method));
 
             if (methodIsAnnotated) {
                 Instant start = Instant.now();
@@ -80,7 +80,7 @@ public class LogExecutionTimeBeanPostProcessor implements BeanPostProcessor {
         });
     }
 
-    private boolean equals(Method one, Method other) {
+    private boolean areMethodsEqual(Method one, Method other) {
         if (one.getName().equals(other.getName())) {
             return equalParamTypes(one.getParameterTypes(), other.getParameterTypes());
         }
