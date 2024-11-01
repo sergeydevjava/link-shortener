@@ -1,6 +1,8 @@
 package org.sergeydevjava.service.impl;
 
+
 import org.apache.commons.lang3.RandomStringUtils;
+import org.sergeydevjava.annotation.LogExecutionTime;
 import org.sergeydevjava.dto.CreateLinkInfoRequest;
 import org.sergeydevjava.dto.LinkInfoResponse;
 import org.sergeydevjava.dto.UpdateShortLinkRequest;
@@ -9,18 +11,15 @@ import org.sergeydevjava.model.LinkInfo;
 import org.sergeydevjava.property.LinkInfoProperty;
 import org.sergeydevjava.repository.LinkInfoRepository;
 import org.sergeydevjava.service.LinkInfoService;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Consumer;
 
-import static java.util.Objects.nonNull;
-import static jdk.dynalink.linker.support.Guards.isNotNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-
+@Service
 public class LinkInfoServiceImpl implements LinkInfoService {
 
     private final LinkInfoRepository linkInfoRepository;
@@ -32,6 +31,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     }
 
     @Override
+    @LogExecutionTime
     public LinkInfoResponse createLinkInfo(CreateLinkInfoRequest createLinkInfoRequest) {
         LinkInfo linkInfo = LinkInfo.builder()
                 .link(createLinkInfoRequest.getLink())
@@ -48,6 +48,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     }
 
     @Override
+    @LogExecutionTime
     public LinkInfoResponse getByShortLink(String shortLink) {
         return linkInfoRepository.findByShortLink(shortLink)
                 .map(this::toResponse)
@@ -55,6 +56,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     }
 
     @Override
+    @LogExecutionTime
     public List<LinkInfoResponse> findByFilter() {
         return linkInfoRepository.findAll()
                 .stream()
@@ -63,26 +65,28 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     }
 
     @Override
+    @LogExecutionTime
     public void deleteById(UUID id) {
         linkInfoRepository.deleteById(id);
     }
 
     @Override
+    @LogExecutionTime
     public LinkInfoResponse update(UpdateShortLinkRequest updateShortLinkRequest) {
         LinkInfo linkInfo = linkInfoRepository
                 .findById(updateShortLinkRequest.getId())
                 .orElseThrow(() -> new NotFoundException("Не возможно найти сущность: идентификатор " + updateShortLinkRequest.getId()));
 
-        if(isNotEmpty(updateShortLinkRequest.getLink())) {
+        if (isNotEmpty(updateShortLinkRequest.getLink())) {
             linkInfo.setLink(updateShortLinkRequest.getLink());
         }
-        if(!Objects.isNull(updateShortLinkRequest.getEndTime())) {
+        if (!Objects.isNull(updateShortLinkRequest.getEndTime())) {
             linkInfo.setEndTime(updateShortLinkRequest.getEndTime());
         }
-        if(isNotEmpty(updateShortLinkRequest.getDescription())) {
+        if (isNotEmpty(updateShortLinkRequest.getDescription())) {
             linkInfo.setDescription(updateShortLinkRequest.getDescription());
         }
-        if(!Objects.isNull(updateShortLinkRequest.getActive())) {
+        if (!Objects.isNull(updateShortLinkRequest.getActive())) {
             linkInfo.setActive(updateShortLinkRequest.getActive());
         }
         return toResponse(linkInfoRepository.save(linkInfo));
