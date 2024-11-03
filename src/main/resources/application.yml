@@ -1,4 +1,13 @@
 
+server:
+  port: ${LINK_SHORTENER_PORT:8080}
+  servlet:
+    context-path: /${spring.application.name}
+
+spring:
+  application:
+    name: link-shortener
+
 link-shortener:
   short-link-length: 8
   logging:
