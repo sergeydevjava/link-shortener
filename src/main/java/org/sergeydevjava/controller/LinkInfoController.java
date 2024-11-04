@@ -8,7 +8,6 @@ import org.sergeydevjava.dto.UpdateShortLinkRequest;
 import org.sergeydevjava.dto.common.CommonRequest;
 import org.sergeydevjava.dto.common.CommonResponse;
 import org.sergeydevjava.service.LinkInfoService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,24 +24,31 @@ public class LinkInfoController {
     @GetMapping
     public CommonResponse<List<LinkInfoResponse>> findByFilter() {
         List<LinkInfoResponse> foundByFilter = linkInfoService.findByFilter();
-        return CommonResponse.<List<LinkInfoResponse>>builder().body(foundByFilter).build();
+        return CommonResponse.<List<LinkInfoResponse>>builder()
+                .body(foundByFilter)
+                .build();
     }
 
     @PostMapping
     public CommonResponse<LinkInfoResponse> createLinkInfo(@RequestBody CommonRequest<CreateLinkInfoRequest> request) {
         LinkInfoResponse linkInfo = linkInfoService.createLinkInfo(request.getBody());
-        return CommonResponse.<LinkInfoResponse>builder().body(linkInfo).build();
+        return CommonResponse.<LinkInfoResponse>builder()
+                .body(linkInfo)
+                .build();
     }
 
     @PatchMapping
     public CommonResponse<LinkInfoResponse> updateLinkInfo(@RequestBody CommonRequest<UpdateShortLinkRequest> request) {
         LinkInfoResponse linkInfo = linkInfoService.update(request.getBody());
-        return CommonResponse.<LinkInfoResponse>builder().body(linkInfo).build();
+        return CommonResponse.<LinkInfoResponse>builder()
+                .body(linkInfo)
+                .build();
     }
 
     @DeleteMapping("/{linkId}")
-    public ResponseEntity<String> deleteLinkInfo(@PathVariable String linkId) {
-        linkInfoService.deleteById(UUID.fromString(linkId));
-        return ResponseEntity.ok("Ссылка удалена");
+    public CommonResponse<?> deleteLinkInfo(@PathVariable UUID linkId) {
+        linkInfoService.deleteById(linkId);
+        return CommonResponse.<LinkInfoResponse>builder()
+                .build();
     }
 }

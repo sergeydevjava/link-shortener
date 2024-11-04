@@ -2,6 +2,7 @@ package org.sergeydevjava.repository;
 
 import org.sergeydevjava.model.LinkInfo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,4 +17,6 @@ public interface LinkInfoRepository {
     void deleteById(UUID id);
 
     Optional<LinkInfo> findById(UUID id);
+
+    Optional<LinkInfo> findByShortLinkAndActiveIsTrueAndEndTimeIsAfter(String shortLink, LocalDateTime now);
 }

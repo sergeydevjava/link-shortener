@@ -1,9 +1,8 @@
 package org.sergeydevjava.controller;
 
-import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import org.sergeydevjava.service.LinkInfoService;
-import org.sergeydevjava.validation.ValidLink;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ public class ShortLinkController {
     private final LinkInfoService linkInfoService;
 
     @GetMapping("/{shortLink}")
-    public ResponseEntity<String> getByShortLink(@Valid @ValidLink @PathVariable String shortLink) {
+    public ResponseEntity<String> getByShortLink(@PathVariable String shortLink) {
         return ResponseEntity
                 .status(HttpStatus.TEMPORARY_REDIRECT)
                 .header(HttpHeaders.LOCATION, linkInfoService.getByShortLink(shortLink).getLink())

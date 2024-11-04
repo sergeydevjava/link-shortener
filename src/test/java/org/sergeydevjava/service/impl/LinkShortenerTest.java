@@ -86,7 +86,7 @@ public class LinkShortenerTest extends AbstractTest {
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfoResponseCommonResponse.getBody().getShortLink().length());
 
         ResultActions getByShortLinkResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/short-link/" + linkInfoResponseCommonResponse.getBody().getShortLink()))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class LinkShortenerTest extends AbstractTest {
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfoResponseCommonResponse.getBody().getShortLink().length());
 
         ResultActions getByShortLinkResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/short-link/" + linkInfoResponseCommonResponse.getBody().getShortLink()))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     private CommonResponse<LinkInfoResponse> createShortLink(String path) throws Exception {
@@ -106,8 +106,7 @@ public class LinkShortenerTest extends AbstractTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         String jsonResponse = createShortLinkResult.andReturn().getResponse().getContentAsString();
-        return objectMapper.readValue(jsonResponse, new TypeReference<CommonResponse<LinkInfoResponse>>() {
-        });
+        return objectMapper.readValue(jsonResponse, new TypeReference<CommonResponse<LinkInfoResponse>>() {});
     }
 
     private CommonResponse<List<LinkInfoResponse>> findLinkByFilter() throws Exception {
@@ -116,8 +115,7 @@ public class LinkShortenerTest extends AbstractTest {
 
         return objectMapper.readValue(
                 findByFilterResult.andReturn().getResponse().getContentAsString(),
-                new TypeReference<CommonResponse<List<LinkInfoResponse>>>() {
-                });
+                new TypeReference<CommonResponse<List<LinkInfoResponse>>>() {});
     }
 
     private void updateLinkDescription(CommonResponse<List<LinkInfoResponse>> listCommonResponse) throws Exception {

@@ -13,6 +13,7 @@ import org.sergeydevjava.repository.LinkInfoRepository;
 import org.sergeydevjava.service.LinkInfoService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -50,9 +51,9 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @Override
     @LogExecutionTime
     public LinkInfoResponse getByShortLink(String shortLink) {
-        return linkInfoRepository.findByShortLink(shortLink)
+        return linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeIsAfter(shortLink, LocalDateTime.now())
                 .map(this::toResponse)
-                .orElseThrow(() -> new NotFoundException("Не удалось найти сущность по короткой ссылке: " + shortLink));
+                .orElseThrow(() -> new NotFoundException("Не удалось найти активную не устаревшую сущность по короткой ссылке: " + shortLink));
     }
 
     @Override
