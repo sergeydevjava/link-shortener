@@ -4,6 +4,7 @@ import org.sergeydevjava.model.LinkInfo;
 import org.sergeydevjava.repository.LinkInfoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,5 +47,13 @@ public class LinkInfoRepositoryImpl implements LinkInfoRepository {
         return storage.values().stream()
                 .filter(linkInfo -> linkInfo.getId().equals(id))
                 .findFirst();
+    }
+
+    @Override
+    public Optional<LinkInfo> findByShortLinkAndActiveIsTrueAndEndTimeIsAfter(String shortLink, LocalDateTime now) {
+        return Optional.ofNullable(storage.get(shortLink))
+                .filter(
+                        linkInfo -> linkInfo.getActive()
+                                && linkInfo.getEndTime().isAfter(now));
     }
 }
