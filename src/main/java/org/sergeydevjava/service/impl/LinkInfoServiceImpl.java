@@ -7,6 +7,7 @@ import org.sergeydevjava.dto.CreateLinkInfoRequest;
 import org.sergeydevjava.dto.LinkInfoResponse;
 import org.sergeydevjava.dto.UpdateShortLinkRequest;
 import org.sergeydevjava.exception.NotFoundException;
+import org.sergeydevjava.mapper.LinkInfoMapper;
 import org.sergeydevjava.model.LinkInfo;
 import org.sergeydevjava.property.LinkInfoProperty;
 import org.sergeydevjava.repository.LinkInfoRepository;
@@ -14,6 +15,7 @@ import org.sergeydevjava.service.LinkInfoService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -23,36 +25,34 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Service
 public class LinkInfoServiceImpl implements LinkInfoService {
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
     private final LinkInfoRepository linkInfoRepository;
     private final LinkInfoProperty linkInfoProperty;
+    private final LinkInfoMapper linkInfoMapper;
 
-    public LinkInfoServiceImpl(LinkInfoRepository linkInfoRepository, LinkInfoProperty linkInfoProperty) {
+    public LinkInfoServiceImpl(LinkInfoRepository linkInfoRepository, LinkInfoProperty linkInfoProperty, LinkInfoMapper linkInfoMapper) {
         this.linkInfoRepository = linkInfoRepository;
         this.linkInfoProperty = linkInfoProperty;
+        this.linkInfoMapper = linkInfoMapper;
     }
 
     @Override
     @LogExecutionTime
     public LinkInfoResponse createLinkInfo(CreateLinkInfoRequest createLinkInfoRequest) {
-        LinkInfo linkInfo = LinkInfo.builder()
-                .link(createLinkInfoRequest.getLink())
-                .shortLink(RandomStringUtils.randomAlphabetic(linkInfoProperty.getShortLinkLength()))
-                .endTime(createLinkInfoRequest.getEndTime())
-                .description(createLinkInfoRequest.getDescription())
-                .active(createLinkInfoRequest.getActive())
-                .openingCount(0L)
-                .build();
+
+        LinkInfo linkInfo = linkInfoMapper.fromCreateRequest(createLinkInfoRequest, RandomStringUtils.randomAlphabetic(linkInfoProperty.getShortLinkLength()));
 
         LinkInfo savedLinkInfo = linkInfoRepository.save(linkInfo);
 
-        return toResponse(savedLinkInfo);
+        return linkInfoMapper.toResponse(savedLinkInfo);
     }
 
     @Override
     @LogExecutionTime
     public LinkInfoResponse getByShortLink(String shortLink) {
         return linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeIsAfter(shortLink, LocalDateTime.now())
-                .map(this::toResponse)
+                .map(linkInfoMapper::toResponse)
                 .orElseThrow(() -> new NotFoundException("Не удалось найти активную не устаревшую сущность по короткой ссылке: " + shortLink));
     }
 
@@ -61,7 +61,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     public List<LinkInfoResponse> findByFilter() {
         return linkInfoRepository.findAll()
                 .stream()
-                .map(this::toResponse)
+                .map(linkInfoMapper::toResponse)
                 .toList();
     }
 
@@ -75,14 +75,14 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @LogExecutionTime
     public LinkInfoResponse update(UpdateShortLinkRequest updateShortLinkRequest) {
         LinkInfo linkInfo = linkInfoRepository
-                .findById(updateShortLinkRequest.getId())
+                .findById(UUID.fromString(updateShortLinkRequest.getId()))
                 .orElseThrow(() -> new NotFoundException("Не возможно найти сущность: идентификатор " + updateShortLinkRequest.getId()));
 
         if (isNotEmpty(updateShortLinkRequest.getLink())) {
             linkInfo.setLink(updateShortLinkRequest.getLink());
         }
         if (!Objects.isNull(updateShortLinkRequest.getEndTime())) {
-            linkInfo.setEndTime(updateShortLinkRequest.getEndTime());
+            linkInfo.setEndTime(LocalDateTime.parse(updateShortLinkRequest.getEndTime(), formatter));
         }
         if (isNotEmpty(updateShortLinkRequest.getDescription())) {
             linkInfo.setDescription(updateShortLinkRequest.getDescription());
@@ -90,18 +90,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         if (!Objects.isNull(updateShortLinkRequest.getActive())) {
             linkInfo.setActive(updateShortLinkRequest.getActive());
         }
-        return toResponse(linkInfoRepository.save(linkInfo));
+        return linkInfoMapper.toResponse(linkInfoRepository.save(linkInfo));
     }
 
-    private LinkInfoResponse toResponse(LinkInfo linkInfo) {
-        return LinkInfoResponse.builder()
-                .id(linkInfo.getId())
-                .link(linkInfo.getLink())
-                .shortLink(linkInfo.getShortLink())
-                .endTime(linkInfo.getEndTime())
-                .description(linkInfo.getDescription())
-                .active(linkInfo.getActive())
-                .openingCount(linkInfo.getOpeningCount())
-                .build();
-    }
 }

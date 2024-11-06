@@ -58,7 +58,7 @@ class LinkInfoServiceImplTest {
         LinkInfoResponse linkInfo = createShortLink("http://somedomain1.com");
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfo.getShortLink().length());
         assertTrue(linkInfoService.getByShortLink(linkInfo.getShortLink()).getActive());
-        linkInfoService.update(UpdateShortLinkRequest.builder().id(linkInfo.getId()).active(Boolean.FALSE).build());
+        linkInfoService.update(UpdateShortLinkRequest.builder().id(linkInfo.getId().toString()).active(Boolean.FALSE).build());
         assertFalse(linkInfoService.getByShortLink(linkInfo.getShortLink()).getActive());
     }
 
@@ -69,7 +69,7 @@ class LinkInfoServiceImplTest {
     private LinkInfoResponse createShortLink(String longLink) {
         CreateLinkInfoRequest createLinkInfoRequest = CreateLinkInfoRequest.builder()
                 .link(isNotEmpty(longLink) ? longLink : "http://somedomain.com")
-                .endTime(LocalDateTime.now().plusDays(30))
+                .endTime(LocalDateTime.now().plusDays(30).toString())
                 .description("Some description")
                 .active(Boolean.TRUE)
                 .build();
