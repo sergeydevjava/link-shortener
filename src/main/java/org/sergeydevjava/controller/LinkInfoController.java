@@ -1,5 +1,6 @@
 package org.sergeydevjava.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sergeydevjava.dto.CreateLinkInfoRequest;
@@ -30,7 +31,7 @@ public class LinkInfoController {
     }
 
     @PostMapping
-    public CommonResponse<LinkInfoResponse> createLinkInfo(@RequestBody CommonRequest<CreateLinkInfoRequest> request) {
+    public CommonResponse<LinkInfoResponse> createLinkInfo(@RequestBody @Valid CommonRequest<CreateLinkInfoRequest> request) {
         LinkInfoResponse linkInfo = linkInfoService.createLinkInfo(request.getBody());
         return CommonResponse.<LinkInfoResponse>builder()
                 .body(linkInfo)
@@ -38,7 +39,7 @@ public class LinkInfoController {
     }
 
     @PatchMapping
-    public CommonResponse<LinkInfoResponse> updateLinkInfo(@RequestBody CommonRequest<UpdateShortLinkRequest> request) {
+    public CommonResponse<LinkInfoResponse> updateLinkInfo(@RequestBody @Valid CommonRequest<UpdateShortLinkRequest> request) {
         LinkInfoResponse linkInfo = linkInfoService.update(request.getBody());
         return CommonResponse.<LinkInfoResponse>builder()
                 .body(linkInfo)

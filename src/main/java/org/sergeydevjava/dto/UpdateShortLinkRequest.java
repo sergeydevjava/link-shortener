@@ -1,9 +1,9 @@
 package org.sergeydevjava.dto;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
+import org.sergeydevjava.validation.ValidLocalDateTime;
+import org.sergeydevjava.validation.ValidUUID;
 
 @Getter
 @Setter
@@ -11,10 +11,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateShortLinkRequest {
-
-    private UUID id;
+    @ValidUUID
+    private String id;
+    @Pattern(regexp = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$", message = "Url не соответствует патерну")
     private String link;
-    private LocalDateTime endTime;
+    @ValidLocalDateTime(shouldBeInFuture = false)
+    private String endTime;
     private String description;
     private Boolean active;
 }
