@@ -40,7 +40,8 @@ public class LinkShortenerException {
                 .map(fe -> ValidationError.builder()
                         .field(fe.getField())
                         .message(fe.getDefaultMessage())
-                        .build()).toList();
+                        .build())
+                .toList();
 
         log.warn("Ошибка валидации {}", validationError, e);
 
@@ -50,6 +51,7 @@ public class LinkShortenerException {
                 .build();
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public CommonResponse<?> handleException(Exception e) {
         log.error("Непредвиденное исключение: {}", e.getMessage(), e);

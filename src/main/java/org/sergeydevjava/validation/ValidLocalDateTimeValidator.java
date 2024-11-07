@@ -23,7 +23,7 @@ public class ValidLocalDateTimeValidator implements ConstraintValidator<ValidLoc
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null) {
-            return !shouldBeInFuture;
+            return true;
         }
         try {
             LocalDateTime dateTime = LocalDateTime.parse(value, formatter);
