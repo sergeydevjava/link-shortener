@@ -1,13 +1,16 @@
 package org.sergeydevjava.controller;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sergeydevjava.dto.common.CommonResponse;
 import org.sergeydevjava.dto.common.ValidationError;
-import org.sergeydevjava.exception.NotFoundException;
+import org.sergeydevjava.exception.NotFoundShortLinkException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -23,8 +27,8 @@ public class LinkShortenerException {
 
     private final String notFoundPage;
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<?> handleNotFoundExceptionException(NotFoundException e) {
+    @ExceptionHandler(NotFoundShortLinkException.class)
+    public ResponseEntity<?> handleNotFoundExceptionException(NotFoundShortLinkException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.TEXT_HTML)
@@ -59,5 +63,27 @@ public class LinkShortenerException {
         return CommonResponse.builder()
                 .errorMessage("Непредвиденное исключение: " + e.getMessage())
                 .build();
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public CommonResponse<?> handleInvalidFormatException(HttpMessageNotReadableException e) {
+        if (e.getCause() instanceof InvalidFormatException ife) {
+
+            String path = ife.getPath().stream()
+                    .map(JsonMappingException.Reference::getFieldName)
+                    .collect(Collectors.joining("."));
+
+
+            String errMessage = "Ошибка валидации, некорректный формат поля: '" + path + "'";
+
+            log.error(errMessage, e);
+
+            return CommonResponse.builder()
+                    .errorMessage(errMessage)
+                    .build();
+        }
+
+        return handleException(e);
     }
 }

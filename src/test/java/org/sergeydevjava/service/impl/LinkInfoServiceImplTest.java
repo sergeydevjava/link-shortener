@@ -2,6 +2,7 @@ package org.sergeydevjava.service.impl;
 
 import org.junit.jupiter.api.Test;
 import org.sergeydevjava.dto.CreateLinkInfoRequest;
+import org.sergeydevjava.dto.FilterLinkInfoRequest;
 import org.sergeydevjava.dto.LinkInfoResponse;
 import org.sergeydevjava.dto.UpdateShortLinkRequest;
 import org.sergeydevjava.exception.NotFoundException;
@@ -42,7 +43,7 @@ class LinkInfoServiceImplTest {
     @Test
     void findAllShortLink() {
         IntStream.range(0, NUMBER_OF_GENERATED_LINK).forEach(it -> createShortLink());
-        assertEquals(NUMBER_OF_GENERATED_LINK, linkInfoService.findByFilter().size());
+        assertEquals(NUMBER_OF_GENERATED_LINK, linkInfoService.findByFilter(new FilterLinkInfoRequest()).size());
     }
 
     @Test

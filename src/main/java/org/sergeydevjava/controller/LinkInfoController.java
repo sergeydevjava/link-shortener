@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sergeydevjava.dto.CreateLinkInfoRequest;
+import org.sergeydevjava.dto.FilterLinkInfoRequest;
 import org.sergeydevjava.dto.LinkInfoResponse;
 import org.sergeydevjava.dto.UpdateShortLinkRequest;
 import org.sergeydevjava.dto.common.CommonRequest;
@@ -22,9 +23,9 @@ public class LinkInfoController {
 
     private final LinkInfoService linkInfoService;
 
-    @GetMapping
-    public CommonResponse<List<LinkInfoResponse>> findByFilter() {
-        List<LinkInfoResponse> foundByFilter = linkInfoService.findByFilter();
+    @PostMapping("/filter")
+    public CommonResponse<List<LinkInfoResponse>> findByFilter(@RequestBody @Valid CommonRequest<FilterLinkInfoRequest> filterLinkInfoRequest) {
+        List<LinkInfoResponse> foundByFilter = linkInfoService.findByFilter(filterLinkInfoRequest.getBody());
         return CommonResponse.<List<LinkInfoResponse>>builder()
                 .body(foundByFilter)
                 .build();

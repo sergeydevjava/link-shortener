@@ -2,6 +2,7 @@ package org.sergeydevjava.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.sergeydevjava.dto.CreateLinkInfoRequest;
+import org.sergeydevjava.dto.FilterLinkInfoRequest;
 import org.sergeydevjava.dto.LinkInfoResponse;
 import org.sergeydevjava.dto.UpdateShortLinkRequest;
 import org.sergeydevjava.service.LinkInfoService;
@@ -32,8 +33,8 @@ public class LogExecutionTimeLinkInfoServiceProxy implements LinkInfoService {
     }
 
     @Override
-    public List<LinkInfoResponse> findByFilter() {
-        return supplyWithTimeTrack("findByFilter", linkInfoService::findByFilter);
+    public List<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest) {
+        return supplyWithTimeTrack("findByFilter", () -> linkInfoService.findByFilter(filterLinkInfoRequest));
     }
 
     @Override

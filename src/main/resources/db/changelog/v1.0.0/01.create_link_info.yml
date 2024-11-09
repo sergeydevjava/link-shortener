@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: "01.create_link_info.yml"
+      author: "sn@mail.com"
+      changes:
+        - createTable:
+            tableName: link_info
+            remarks: "Информация о коротких ссылках"
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: link
+                  type: varchar
+                  remarks: "Длинная ссылка"
+              - column:
+                  name: end_time
+                  type: timestamptz
+                  remarks: "Дата окончания действия короткой ссылки"
+              - column:
+                  name: description
+                  type: varchar
+                  remarks: "Описание короткой ссылки"
+              - column:
+                  name: active
+                  type: bool
+                  remarks: "Признак активности короткой ссылки"
+              - column:
+                  name: short_link
+                  type: varchar
+                  remarks: "Короткая ссылка"
+                  constraints:
+                    unique: true
+              - column:
+                  name: opening_count
+                  type: bigint
+                  remarks: "Количество открытий ссылки"
+              - column:
+                  name: create_time
+                  type: timestamptz
+                  remarks: "Время создания"
+              - column:
+                  name: create_user
+                  type: varchar
+                  remarks: "Пользователь который создал запись"
+              - column:
+                  name: last_update_time
+                  type: timestamptz
+                  remarks: "Время последнего изменения"
+              - column:
+                  name: last_update_user
+                  type: varchar
+                  remarks: "Пользователь который изменил запись"
