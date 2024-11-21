@@ -2,6 +2,7 @@ package org.sergeydevjava.service;
 
 
 import org.sergeydevjava.dto.CreateLinkInfoRequest;
+import org.sergeydevjava.dto.FilterLinkInfoRequest;
 import org.sergeydevjava.dto.LinkInfoResponse;
 import org.sergeydevjava.dto.UpdateShortLinkRequest;
 
@@ -14,7 +15,7 @@ public interface LinkInfoService {
 
     LinkInfoResponse getByShortLink(String shortLink);
 
-    List<LinkInfoResponse> findByFilter();
+    List<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest);
 
     void deleteById(UUID id);
 

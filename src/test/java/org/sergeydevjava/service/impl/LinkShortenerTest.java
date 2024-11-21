@@ -30,7 +30,7 @@ public class LinkShortenerTest extends AbstractTest {
 
     @BeforeEach
     void deleteExistingLinks() throws Exception {
-        for (LinkInfoResponse lir : findLinkByFilter().getBody()) {
+        for (LinkInfoResponse lir : findLinkByFilter("json/request/find-all-filter-request.json").getBody()) {
             performLinkDeletion(lir.getId().toString());
         }
     }
@@ -41,12 +41,17 @@ public class LinkShortenerTest extends AbstractTest {
 
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfoResponseCommonResponse.getBody().getShortLink().length());
 
+        assertEquals(0L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().getFirst().getOpeningCount());
+
         ResultActions getByShortLinkResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/short-link/" + linkInfoResponseCommonResponse.getBody().getShortLink()))
                 .andExpect(MockMvcResultMatchers.status().isTemporaryRedirect());
 
         String link = parseHeader(getByShortLinkResult.andReturn(), HttpHeaders.LOCATION);
 
         assertEquals(linkInfoResponseCommonResponse.getBody().getLink(), link);
+
+        assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().getFirst().getOpeningCount());
+        assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().getFirst().getOpeningCount());
     }
 
     @Test
@@ -55,13 +60,13 @@ public class LinkShortenerTest extends AbstractTest {
         CommonResponse<LinkInfoResponse> linkInfoResponseCommonResponse = createShortLink("json/request/link-info-request.json");
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfoResponseCommonResponse.getBody().getShortLink().length());
 
-        CommonResponse<List<LinkInfoResponse>> listCommonResponse = findLinkByFilter();
+        CommonResponse<List<LinkInfoResponse>> listCommonResponse = findLinkByFilter("json/request/find-all-filter-request.json");
         assertEquals(listCommonResponse.getBody().size(), 1L);
         assertEquals(listCommonResponse.getBody().getFirst().getDescription(), "google");
 
         updateLinkDescription(listCommonResponse);
 
-        CommonResponse<List<LinkInfoResponse>> listCommonResponseAfterUpdate = findLinkByFilter();
+        CommonResponse<List<LinkInfoResponse>> listCommonResponseAfterUpdate = findLinkByFilter("json/request/find-all-filter-request.json");
         assertEquals(listCommonResponseAfterUpdate.getBody().size(), 1L);
         assertEquals(listCommonResponseAfterUpdate.getBody().getFirst().getDescription(), "yandex");
 
@@ -73,12 +78,12 @@ public class LinkShortenerTest extends AbstractTest {
         CommonResponse<LinkInfoResponse> linkInfoResponseCommonResponse = createShortLink("json/request/link-info-request.json");
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfoResponseCommonResponse.getBody().getShortLink().length());
 
-        CommonResponse<List<LinkInfoResponse>> listCommonResponse = findLinkByFilter();
+        CommonResponse<List<LinkInfoResponse>> listCommonResponse = findLinkByFilter("json/request/find-all-filter-request.json");
         assertEquals(listCommonResponse.getBody().size(), 1L);
 
         performLinkDeletion(listCommonResponse.getBody().getFirst().getId().toString());
 
-        CommonResponse<List<LinkInfoResponse>> listCommonResponseAfterUpdate = findLinkByFilter();
+        CommonResponse<List<LinkInfoResponse>> listCommonResponseAfterUpdate = findLinkByFilter("json/request/find-all-filter-request.json");
         assertEquals(listCommonResponseAfterUpdate.getBody().size(), 0L);
 
     }
@@ -146,8 +151,10 @@ public class LinkShortenerTest extends AbstractTest {
         });
     }
 
-    private CommonResponse<List<LinkInfoResponse>> findLinkByFilter() throws Exception {
-        ResultActions findByFilterResult = mockMvc.perform(MockMvcRequestBuilders.get(API_V_1_LINK_INFOS))
+    private CommonResponse<List<LinkInfoResponse>> findLinkByFilter(String path) throws Exception {
+        ResultActions findByFilterResult = mockMvc.perform(MockMvcRequestBuilders.post(API_V_1_LINK_INFOS + "/filter")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertFileToString(path)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         return objectMapper.readValue(

@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: release/1.0.0
+      author: "sn@mail.com"
+      changes:
+        - tagDatabase:
+            tag: release/1.0.0
+  - include:
+      file: 01.create_link_info.yml
+      relativeToChangelogFile: true

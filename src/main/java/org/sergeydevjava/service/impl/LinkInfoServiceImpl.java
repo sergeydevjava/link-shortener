@@ -4,9 +4,11 @@ package org.sergeydevjava.service.impl;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.sergeydevjava.annotation.LogExecutionTime;
 import org.sergeydevjava.dto.CreateLinkInfoRequest;
+import org.sergeydevjava.dto.FilterLinkInfoRequest;
 import org.sergeydevjava.dto.LinkInfoResponse;
 import org.sergeydevjava.dto.UpdateShortLinkRequest;
 import org.sergeydevjava.exception.NotFoundException;
+import org.sergeydevjava.exception.NotFoundShortLinkException;
 import org.sergeydevjava.mapper.LinkInfoMapper;
 import org.sergeydevjava.model.LinkInfo;
 import org.sergeydevjava.property.LinkInfoProperty;
@@ -51,15 +53,25 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @Override
     @LogExecutionTime
     public LinkInfoResponse getByShortLink(String shortLink) {
-        return linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeIsAfter(shortLink, LocalDateTime.now())
-                .map(linkInfoMapper::toResponse)
-                .orElseThrow(() -> new NotFoundException("Не удалось найти активную не устаревшую сущность по короткой ссылке: " + shortLink));
+        LinkInfo activeShortLink = linkInfoRepository.findActiveShortLink(shortLink, LocalDateTime.now())
+                .orElseThrow(() -> new NotFoundShortLinkException("Не удалось найти активную не устаревшую сущность по короткой ссылке: " + shortLink));
+
+        linkInfoRepository.incrementOpeningCountByShortLink(shortLink);
+
+        return linkInfoMapper.toResponse(activeShortLink);
+
     }
 
     @Override
     @LogExecutionTime
-    public List<LinkInfoResponse> findByFilter() {
-        return linkInfoRepository.findAll()
+    public List<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest) {
+        return linkInfoRepository.findByFilter(
+                        filterLinkInfoRequest.getLinkPart(),
+                        filterLinkInfoRequest.getEndTimeFrom(),
+                        filterLinkInfoRequest.getEndTimeTo(),
+                        filterLinkInfoRequest.getDescription(),
+                        filterLinkInfoRequest.getActive()
+                )
                 .stream()
                 .map(linkInfoMapper::toResponse)
                 .toList();
@@ -81,9 +93,9 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         if (isNotEmpty(updateShortLinkRequest.getLink())) {
             linkInfo.setLink(updateShortLinkRequest.getLink());
         }
-        if (!Objects.isNull(updateShortLinkRequest.getEndTime())) {
-            linkInfo.setEndTime(LocalDateTime.parse(updateShortLinkRequest.getEndTime(), formatter));
-        }
+
+        linkInfo.setEndTime(LocalDateTime.parse(updateShortLinkRequest.getEndTime(), formatter));
+
         if (isNotEmpty(updateShortLinkRequest.getDescription())) {
             linkInfo.setDescription(updateShortLinkRequest.getDescription());
         }
