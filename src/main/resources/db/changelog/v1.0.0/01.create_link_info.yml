@@ -18,7 +18,7 @@ databaseChangeLog:
                   remarks: "Длинная ссылка"
               - column:
                   name: end_time
-                  type: timestamptz
+                  type: timestamp
                   remarks: "Дата окончания действия короткой ссылки"
               - column:
                   name: description
@@ -40,7 +40,7 @@ databaseChangeLog:
                   remarks: "Количество открытий ссылки"
               - column:
                   name: create_time
-                  type: timestamptz
+                  type: timestamp
                   remarks: "Время создания"
               - column:
                   name: create_user
@@ -48,7 +48,7 @@ databaseChangeLog:
                   remarks: "Пользователь который создал запись"
               - column:
                   name: last_update_time
-                  type: timestamptz
+                  type: timestamp
                   remarks: "Время последнего изменения"
               - column:
                   name: last_update_user
