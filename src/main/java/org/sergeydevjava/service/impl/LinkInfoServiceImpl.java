@@ -1,12 +1,9 @@
 package org.sergeydevjava.service.impl;
 
 
+import com.sergeydevjava.annotation.LogExecutionTime;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.sergeydevjava.annotation.LogExecutionTime;
-import org.sergeydevjava.dto.CreateLinkInfoRequest;
-import org.sergeydevjava.dto.FilterLinkInfoRequest;
-import org.sergeydevjava.dto.LinkInfoResponse;
-import org.sergeydevjava.dto.UpdateShortLinkRequest;
+import org.sergeydevjava.dto.*;
 import org.sergeydevjava.exception.NotFoundException;
 import org.sergeydevjava.exception.NotFoundShortLinkException;
 import org.sergeydevjava.mapper.LinkInfoMapper;
@@ -14,6 +11,9 @@ import org.sergeydevjava.model.LinkInfo;
 import org.sergeydevjava.property.LinkInfoProperty;
 import org.sergeydevjava.repository.LinkInfoRepository;
 import org.sergeydevjava.service.LinkInfoService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -65,12 +65,17 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @Override
     @LogExecutionTime
     public List<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest) {
+        PageableRequest page = filterLinkInfoRequest.getPage();
+
+        Pageable pageable = mapPageable(page);
+
         return linkInfoRepository.findByFilter(
                         filterLinkInfoRequest.getLinkPart(),
                         filterLinkInfoRequest.getEndTimeFrom(),
                         filterLinkInfoRequest.getEndTimeTo(),
                         filterLinkInfoRequest.getDescription(),
-                        filterLinkInfoRequest.getActive()
+                        filterLinkInfoRequest.getActive(),
+                        pageable
                 )
                 .stream()
                 .map(linkInfoMapper::toResponse)
@@ -103,6 +108,15 @@ public class LinkInfoServiceImpl implements LinkInfoService {
             linkInfo.setActive(updateShortLinkRequest.getActive());
         }
         return linkInfoMapper.toResponse(linkInfoRepository.save(linkInfo));
+    }
+
+    private static Pageable mapPageable(PageableRequest page) {
+        List<Sort.Order> sorts = page.getSorts().stream()
+                .map(sortRequest -> new Sort.Order(
+                        Sort.Direction.valueOf(sortRequest.getDirection()),
+                        sortRequest.getField()
+                )).toList();
+        return PageRequest.of(page.getNumber() - 1, page.getSize(), Sort.by(sorts));
     }
 
 }

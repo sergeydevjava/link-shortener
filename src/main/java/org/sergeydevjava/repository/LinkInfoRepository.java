@@ -1,13 +1,14 @@
 package org.sergeydevjava.repository;
 
 import org.sergeydevjava.model.LinkInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,20 +34,19 @@ public interface LinkInfoRepository extends JpaRepository<LinkInfo, UUID> {
     void incrementOpeningCountByShortLink(String shortLink);
 
     @Query(value = """
-            SELECT *
-            FROM Link_info
-            WHERE (:linkPart IS NULL OR lower(link) LIKE lower(concat('%', :linkPart, '%')))
-            AND (cast(:endTimeFrom as DATE) IS NULL OR end_time >= :endTimeFrom)
-            AND (cast(:endTimeTo as DATE) IS NULL OR end_time <= :endTimeTo) 
-            AND (:description IS NULL OR lower(description) LIKE lower(concat('%', :description, '%')))
+            FROM LinkInfo
+            WHERE (:linkPart IS NULL OR lower(link) LIKE '%' || lower(cast(:linkPart AS String)) || '%')
+            AND (cast(:endTimeFrom as DATE) IS NULL OR endTime >= :endTimeFrom)
+            AND (cast(:endTimeTo as DATE) IS NULL OR endTime <= :endTimeTo)
+            AND (:description IS NULL OR lower(description) LIKE '%' || lower(cast(:description AS String)) || '%')
             AND (:active IS NULL OR active = :active)
-            """,
-            nativeQuery = true)
-    List<LinkInfo> findByFilter(
+            """)
+    Page<LinkInfo> findByFilter(
             String linkPart,
             LocalDateTime endTimeFrom,
             LocalDateTime endTimeTo,
             String description,
-            Boolean active
+            Boolean active,
+            Pageable pageable
             );
 }

@@ -11,9 +11,11 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url = uri("https://raw.githubusercontent.com/sergeydevjava/logging-starter/main/maven-repo/")
+        url = uri("https://raw.githubusercontent.com/sergeydevjava/logging-starter/hw10/maven-repo/")
     }
 }
+
+def loggingStarterVersion = '1.5-SNAPSHOT'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -32,7 +34,7 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
 //    implementation 'com.sergeydevjava:logging-starter-maven:1.0-SNAPSHOT'
-    implementation 'com.sergeydevjava:logging-starter:1.1-SNAPSHOT'
+    implementation "com.sergeydevjava:logging-starter:${loggingStarterVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

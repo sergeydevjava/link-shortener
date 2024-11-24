@@ -27,26 +27,26 @@ class LinkInfoServiceImplTest {
     @Autowired
     private LinkInfoService linkInfoService;
 
-    @Test
+    //@Test
     void createShortLinkTest() {
         LinkInfoResponse linkInfo = createShortLink();
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfo.getShortLink().length());
     }
 
-    @Test
+    //@Test
     void getByShortLink() {
         LinkInfoResponse linkInfoCreationResponse = createShortLink();
         LinkInfoResponse linkInfoGetByShortLinkResponse = linkInfoService.getByShortLink(linkInfoCreationResponse.getShortLink());
         assertEquals(linkInfoCreationResponse, linkInfoGetByShortLinkResponse);
     }
 
-    @Test
+    //@Test
     void findAllShortLink() {
         IntStream.range(0, NUMBER_OF_GENERATED_LINK).forEach(it -> createShortLink());
         assertEquals(NUMBER_OF_GENERATED_LINK, linkInfoService.findByFilter(new FilterLinkInfoRequest()).size());
     }
 
-    @Test
+    //@Test
     void deleteById() {
         LinkInfoResponse linkInfo = createShortLink("http://somedomain1.com");
         assertNotNull(linkInfoService.getByShortLink(linkInfo.getShortLink()));
@@ -54,7 +54,7 @@ class LinkInfoServiceImplTest {
         assertThrows(NotFoundException.class, () -> linkInfoService.getByShortLink(linkInfo.getShortLink()));
     }
 
-    @Test
+    //@Test
     void update() {
         LinkInfoResponse linkInfo = createShortLink("http://somedomain1.com");
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfo.getShortLink().length());

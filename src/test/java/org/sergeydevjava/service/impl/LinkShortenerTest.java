@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,7 +51,6 @@ public class LinkShortenerTest extends AbstractTest {
 
         assertEquals(linkInfoResponseCommonResponse.getBody().getLink(), link);
 
-        assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().getFirst().getOpeningCount());
         assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().getFirst().getOpeningCount());
     }
 
@@ -135,6 +135,36 @@ public class LinkShortenerTest extends AbstractTest {
         );
     }
 
+    @Test
+    void testPagination() throws Exception {
+        List<CommonResponse<LinkInfoResponse>> list = Stream.generate(() -> {
+                    try {
+                        return createShortLink("json/request/link-info-request.json");
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .limit(3)
+                .toList();
+
+        assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-1.json").getBody().size());
+        assertEquals(3L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().size());
+    }
+
+    @Test
+    void testPaginationAndSorting() throws Exception {
+
+        createShortLink("json/request/link-info-request.json");
+        createShortLink("json/request/link-info-request-yandex.json");
+        createShortLink("json/request/link-info-request-rambler.json");
+
+
+        assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-1.json").getBody().size());
+        assertEquals(3L, findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-3-sort-link-desc.json").getBody().size());
+        assertEquals("yandex", findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-3-sort-link-desc.json").getBody().getFirst().getDescription());
+        assertEquals("google", findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-3-sort-link-asc.json").getBody().getFirst().getDescription());
+    }
+
     private CommonResponse<LinkInfoResponse> createShortLink(String path) throws Exception {
         return createShortLink(path, MockMvcResultMatchers.status().isOk());
     }
@@ -153,8 +183,8 @@ public class LinkShortenerTest extends AbstractTest {
 
     private CommonResponse<List<LinkInfoResponse>> findLinkByFilter(String path) throws Exception {
         ResultActions findByFilterResult = mockMvc.perform(MockMvcRequestBuilders.post(API_V_1_LINK_INFOS + "/filter")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertFileToString(path)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(convertFileToString(path)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         return objectMapper.readValue(

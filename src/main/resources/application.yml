@@ -26,5 +26,11 @@ spring:
 
 link-shortener:
   short-link-length: 8
-  logging:
-    enable-log-execution-time: true
+
+
+logging:
+  log-exec-time: true
+  web-logging:
+    enabled: true
+    log-body: true
+
