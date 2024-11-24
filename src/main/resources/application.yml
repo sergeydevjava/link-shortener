@@ -31,6 +31,5 @@ link-shortener:
 logging:
   log-exec-time: true
   web-logging:
-    enabled: true
     log-body: true
 
