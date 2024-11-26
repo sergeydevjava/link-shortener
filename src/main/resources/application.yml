@@ -33,3 +33,13 @@ logging:
   web-logging:
     log-body: true
 
+web-logging:
+  exclude:
+    - /actuator/.*
+    - /swagger-resources/.*
+    - /api/v1/link-infos/.*
+  obfuscate:
+    headers:
+      - Authorization
+      - Content-Length
+

@@ -15,7 +15,7 @@ repositories {
     }
 }
 
-def loggingStarterVersion = '1.5-SNAPSHOT'
+def loggingStarterVersion = '1.8-SNAPSHOT'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
