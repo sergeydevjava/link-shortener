@@ -26,6 +26,7 @@ public class PageableRequest {
 
     @Valid
     @Builder.Default
-    List<SortRequest> sorts = new ArrayList<>();
+    private List<SortRequest> sorts = new ArrayList<>();
+
 
 }
