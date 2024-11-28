@@ -26,5 +26,20 @@ spring:
 
 link-shortener:
   short-link-length: 8
-  logging:
-    enable-log-execution-time: true
+
+
+logging:
+  log-exec-time: true
+  web-logging:
+    log-body: true
+
+web-logging:
+  exclude:
+    - /actuator/*
+    - /swagger-resources/*
+    - /api/v1/link-infos/**
+  obfuscate:
+    headers:
+      - Authorization
+      - Content-Length
+
