@@ -42,7 +42,7 @@ public class LinkShortenerTest extends AbstractTest {
 
         assertEquals(linkInfoProperty.getShortLinkLength(), linkInfoResponseCommonResponse.getBody().getShortLink().length());
 
-        assertEquals(0L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().getFirst().getOpeningCount());
+        assertEquals(0L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().get(0).getOpeningCount());
 
         ResultActions getByShortLinkResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/short-link/" + linkInfoResponseCommonResponse.getBody().getShortLink()))
                 .andExpect(MockMvcResultMatchers.status().isTemporaryRedirect());
@@ -51,7 +51,7 @@ public class LinkShortenerTest extends AbstractTest {
 
         assertEquals(linkInfoResponseCommonResponse.getBody().getLink(), link);
 
-        assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().getFirst().getOpeningCount());
+        assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request.json").getBody().get(0).getOpeningCount());
     }
 
     @Test
@@ -62,13 +62,13 @@ public class LinkShortenerTest extends AbstractTest {
 
         CommonResponse<List<LinkInfoResponse>> listCommonResponse = findLinkByFilter("json/request/find-all-filter-request.json");
         assertEquals(listCommonResponse.getBody().size(), 1L);
-        assertEquals(listCommonResponse.getBody().getFirst().getDescription(), "google");
+        assertEquals(listCommonResponse.getBody().get(0).getDescription(), "google");
 
         updateLinkDescription(listCommonResponse);
 
         CommonResponse<List<LinkInfoResponse>> listCommonResponseAfterUpdate = findLinkByFilter("json/request/find-all-filter-request.json");
         assertEquals(listCommonResponseAfterUpdate.getBody().size(), 1L);
-        assertEquals(listCommonResponseAfterUpdate.getBody().getFirst().getDescription(), "yandex");
+        assertEquals(listCommonResponseAfterUpdate.getBody().get(0).getDescription(), "yandex");
 
     }
 
@@ -81,7 +81,7 @@ public class LinkShortenerTest extends AbstractTest {
         CommonResponse<List<LinkInfoResponse>> listCommonResponse = findLinkByFilter("json/request/find-all-filter-request.json");
         assertEquals(listCommonResponse.getBody().size(), 1L);
 
-        performLinkDeletion(listCommonResponse.getBody().getFirst().getId().toString());
+        performLinkDeletion(listCommonResponse.getBody().get(0).getId().toString());
 
         CommonResponse<List<LinkInfoResponse>> listCommonResponseAfterUpdate = findLinkByFilter("json/request/find-all-filter-request.json");
         assertEquals(listCommonResponseAfterUpdate.getBody().size(), 0L);
@@ -161,8 +161,8 @@ public class LinkShortenerTest extends AbstractTest {
 
         assertEquals(1L, findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-1.json").getBody().size());
         assertEquals(3L, findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-3-sort-link-desc.json").getBody().size());
-        assertEquals("yandex", findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-3-sort-link-desc.json").getBody().getFirst().getDescription());
-        assertEquals("google", findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-3-sort-link-asc.json").getBody().getFirst().getDescription());
+        assertEquals("yandex", findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-3-sort-link-desc.json").getBody().get(0).getDescription());
+        assertEquals("google", findLinkByFilter("json/request/find-by-link-part-request-pageable-number-1-size-3-sort-link-asc.json").getBody().get(0).getDescription());
     }
 
     private CommonResponse<LinkInfoResponse> createShortLink(String path) throws Exception {
@@ -203,7 +203,7 @@ public class LinkShortenerTest extends AbstractTest {
     private UpdateShortLinkRequest getUpdateShortLinkRequest(CommonResponse<List<LinkInfoResponse>> listCommonResponse) throws IOException {
         UpdateShortLinkRequest updateShortLinkRequest = objectMapper
                 .readValue(convertFileToString("json/request/update-link-info-request.json"), UpdateShortLinkRequest.class);
-        updateShortLinkRequest.setId(listCommonResponse.getBody().getFirst().getId().toString());
+        updateShortLinkRequest.setId(listCommonResponse.getBody().get(0).getId().toString());
         return updateShortLinkRequest;
     }
 
